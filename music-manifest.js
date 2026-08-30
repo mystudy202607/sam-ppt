@@ -1,0 +1,303 @@
+// 由本地 音乐 文件夹自动生成（50 首），请勿手改
+window.SAM_MUSIC_MANIFEST = [
+  {
+    "name": "50 Feet",
+    "artist": "SoMo",
+    "url": "../music/mp3/50%20Feet%20-%20SoMo.mp3",
+    "cover": ""
+  },
+  {
+    "name": "After Hours",
+    "artist": "The Weeknd",
+    "url": "../music/mp3/After%20Hours%20-%20The%20Weeknd.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Attention",
+    "artist": "Charlie Puth",
+    "url": "../music/mp3/Attention%20-%20Charlie%20Puth.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Baby",
+    "artist": "Justin Bieber、Ludacris",
+    "url": "../music/mp3/Baby%20-%20Justin%20Bieber%E3%80%81Ludacris.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Baby Powder",
+    "artist": "Jenevieve",
+    "url": "../music/mp3/Baby%20Powder%20-%20Jenevieve.mp3",
+    "cover": ""
+  },
+  {
+    "name": "BABYDOLL(Speed) (Explicit)",
+    "artist": "Ari Abdul",
+    "url": "../music/mp3/BABYDOLL(Speed)%20(Explicit)%20-%20Ari%20Abdul.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Because Of You",
+    "artist": "Ne-Yo",
+    "url": "../music/mp3/Because%20Of%20You%20-%20Ne-Yo.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Bitter Pill (feat. Jack Dine & Braxton Cook) (Explicit)",
+    "artist": "Christian Kuria、Jack Dine、Braxton Cook",
+    "url": "../music/mp3/Bitter%20Pill%20(feat.%20Jack%20Dine%20&%20Braxton%20Cook)%20(Explicit)%20-%20Christian%20Kuria%E3%80%81Jack%20Dine%E3%80%81Braxton%20Cook.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Bleeding Love",
+    "artist": "Leona Lewis",
+    "url": "../music/mp3/Bleeding%20Love%20-%20Leona%20Lewis.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Booty Music",
+    "artist": "Git Fresh",
+    "url": "../music/mp3/Booty%20Music%20-%20Git%20Fresh.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Break Up In A Small Town",
+    "artist": "Sam Hunt",
+    "url": "../music/mp3/Break%20Up%20In%20A%20Small%20Town%20-%20Sam%20Hunt.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Bye Bye",
+    "artist": "Mariah Carey",
+    "url": "../music/mp3/Bye%20Bye%20-%20Mariah%20Carey.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Call You Tonight",
+    "artist": "Whitney Houston",
+    "url": "../music/mp3/Call%20You%20Tonight%20-%20Whitney%20Houston.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Come Around Me",
+    "artist": "Justin Bieber",
+    "url": "../music/mp3/Come%20Around%20Me%20-%20Justin%20Bieber.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Deep Green",
+    "artist": "Christian Kuria",
+    "url": "../music/mp3/Deep%20Green%20-%20Christian%20Kuria.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Die For You",
+    "artist": "The Weeknd",
+    "url": "../music/mp3/Die%20For%20You%20-%20The%20Weeknd.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Dilemma (Radio Edit)",
+    "artist": "Nelly、Kelly Rowland",
+    "url": "../music/mp3/Dilemma%20(Radio%20Edit)%20-%20Nelly%E3%80%81Kelly%20Rowland.mp3",
+    "cover": ""
+  },
+  {
+    "name": "double take",
+    "artist": "Dhruv",
+    "url": "../music/mp3/double%20take%20-%20Dhruv.mp3",
+    "cover": ""
+  },
+  {
+    "name": "EX",
+    "artist": "Kiana Ledé",
+    "url": "../music/mp3/EX%20-%20Kiana%20Led%C3%A9.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Fallin' Out",
+    "artist": "Keyshia Cole",
+    "url": "../music/mp3/Fallin'%20Out%20-%20Keyshia%20Cole.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Fatal Love",
+    "artist": "Jori King",
+    "url": "../music/mp3/Fatal%20Love%20-%20Jori%20King.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Gimme More",
+    "artist": "Britney Spears",
+    "url": "../music/mp3/Gimme%20More%20-%20Britney%20Spears.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Glow",
+    "artist": "Blaxian",
+    "url": "../music/mp3/Glow%20-%20Blaxian.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Gravity",
+    "artist": "Jai Wolf、JMR",
+    "url": "../music/mp3/Gravity%20-%20Jai%20Wolf%E3%80%81JMR.mp3",
+    "cover": ""
+  },
+  {
+    "name": "HEARTBREAK ANNIVERSARY",
+    "artist": "GIVĒON",
+    "url": "../music/mp3/HEARTBREAK%20ANNIVERSARY%20-%20GIV%C4%92ON.mp3",
+    "cover": ""
+  },
+  {
+    "name": "I Wanna Be",
+    "artist": "Erok",
+    "url": "../music/mp3/I%20Wanna%20Be%20-%20Erok.mp3",
+    "cover": ""
+  },
+  {
+    "name": "I Wanted You",
+    "artist": "Ina Wroldsen",
+    "url": "../music/mp3/I%20Wanted%20You%20-%20Ina%20Wroldsen.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Insomnia",
+    "artist": "Craig David",
+    "url": "../music/mp3/Insomnia%20-%20Craig%20David.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Landslide",
+    "artist": "Oh Wonder",
+    "url": "../music/mp3/Landslide%20-%20Oh%20Wonder.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Leave The Door Open",
+    "artist": "Bruno Mars、Anderson .Paak、Silk Sonic",
+    "url": "../music/mp3/Leave%20The%20Door%20Open%20-%20Bruno%20Mars%E3%80%81Anderson%20.Paak%E3%80%81Silk%20Sonic.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Love Songs",
+    "artist": "kaash paige",
+    "url": "../music/mp3/Love%20Songs%20-%20kaash%20paige.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Love you like I do",
+    "artist": "Jamillions",
+    "url": "../music/mp3/Love%20you%20like%20I%20do%20-%20Jamillions.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Love Yourself",
+    "artist": "Justin Bieber",
+    "url": "../music/mp3/Love%20Yourself%20-%20Justin%20Bieber.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Off The Hook",
+    "artist": "Jeff Jarvis",
+    "url": "../music/mp3/Off%20The%20Hook%20-%20Jeff%20Jarvis.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Out At Sea",
+    "artist": "Tessie",
+    "url": "../music/mp3/Out%20At%20Sea%20-%20Tessie.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Paris in the Rain",
+    "artist": "Lauv",
+    "url": "../music/mp3/Paris%20in%20the%20Rain%20-%20Lauv.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Peaches (Explicit)",
+    "artist": "Justin Bieber、Daniel Caesar、GIVĒON",
+    "url": "../music/mp3/Peaches%20(Explicit)%20-%20Justin%20Bieber%E3%80%81Daniel%20Caesar%E3%80%81GIV%C4%92ON.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Popular (From The Idol Vol. 1Music from the HBO Original SeriesExplicit)",
+    "artist": "The Weeknd、Playboi Carti、Madonna",
+    "url": "../music/mp3/Popular%20(From%20The%20Idol%20Vol.%201Music%20from%20the%20HBO%20Original%20SeriesExplicit)%20-%20The%20Weeknd%E3%80%81Playboi%20Carti%E3%80%81Madonna.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Redbone",
+    "artist": "Kid Travis",
+    "url": "../music/mp3/Redbone%20-%20Kid%20Travis.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Right Now(Na Na Na)",
+    "artist": "Akon",
+    "url": "../music/mp3/Right%20Now(Na%20Na%20Na)%20-%20Akon.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Shut up My Moms Calling",
+    "artist": "Hotel Ugly",
+    "url": "../music/mp3/Shut%20up%20My%20Moms%20Calling%20-%20Hotel%20Ugly.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Sing You To Sleep",
+    "artist": "Matt Cab",
+    "url": "../music/mp3/Sing%20You%20To%20Sleep%20-%20Matt%20Cab.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Snooze",
+    "artist": "SZA",
+    "url": "../music/mp3/Snooze%20-%20SZA.mp3",
+    "cover": ""
+  },
+  {
+    "name": "So Sick",
+    "artist": "Ne-Yo",
+    "url": "../music/mp3/So%20Sick%20-%20Ne-Yo.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Stay Calm",
+    "artist": "Calper、Ayelle",
+    "url": "../music/mp3/Stay%20Calm%20-%20Calper%E3%80%81Ayelle.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Take A Bow",
+    "artist": "Rihanna",
+    "url": "../music/mp3/Take%20A%20Bow%20-%20Rihanna.mp3",
+    "cover": ""
+  },
+  {
+    "name": "This Could Be You",
+    "artist": "Cannon Mapp",
+    "url": "../music/mp3/This%20Could%20Be%20You%20-%20Cannon%20Mapp.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Uptown Funk",
+    "artist": "Mark Ronson、Bruno Mars",
+    "url": "../music/mp3/Uptown%20Funk%20-%20Mark%20Ronson%E3%80%81Bruno%20Mars.mp3",
+    "cover": ""
+  },
+  {
+    "name": "Watch Me Work",
+    "artist": "Tinashe",
+    "url": "../music/mp3/Watch%20Me%20Work%20-%20Tinashe.mp3",
+    "cover": ""
+  },
+  {
+    "name": "wyd (Explicit)",
+    "artist": "Larissa Lambert",
+    "url": "../music/mp3/wyd%20(Explicit)%20-%20Larissa%20Lambert.mp3",
+    "cover": ""
+  }
+];

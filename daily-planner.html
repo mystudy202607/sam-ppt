@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>每日规划</title>
+<script>
+  window.PLANNER_CONFIG = {
+    theme: 'light',                       /* 'light' | 'dark' */
+    date: '',                             /* 'YYYY-MM-DD'，留空 = 今天 */
+    priorityTasks: { high: [], mid: [], low: [] }  /* 预置待办，仅无数据时生效 */
+  };
+</script>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    color-scheme: light;
+    --bg-1: #F8F9FA;
+    --bg-2: #E9ECEF;
+    --surface: #FFFFFF;
+    --ink: #2D3436;
+    --ink-soft: #4A5558;
+    --muted: #636E72;
+    --line: #DEE2E6;
+    --mint: #00B894;
+    --mint-deep: #0B7A62;
+    --mint-ink: #0B3B2E;
+    --mint-soft: #DCF6EE;
+    --mint-hover-bg: #0B7A62;
+    --mint-hover-ink: #FFFFFF;
+    --orange: #E67E22;
+    --orange-soft: #FCEBDD;
+    --gray-soft: #EEF1F3;
+    --danger: #B03030;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(45,52,54,.08), 0 8px 24px rgba(45,52,54,.07);
+    --focus: #0B7A62;
+    --tl-border-todo: #ADB5BD;
+    --tl-border-doing: #E67E22;
+    --tl-border-done: #00B894;
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg-1: #202628;
+    --bg-2: #2D3436;
+    --surface: #343C3E;
+    --ink: #EEF2F1;
+    --ink-soft: #C8D0CE;
+    --muted: #A8B1AF;
+    --line: #475153;
+    --mint: #00B894;
+    --mint-deep: #3FD6B4;
+    --mint-ink: #06281F;
+    --mint-soft: #14382F;
+    --mint-hover-bg: #3FD6B4;
+    --mint-hover-ink: #06281F;
+    --orange: #F39C55;
+    --orange-soft: #4A3219;
+    --gray-soft: #414A4C;
+    --danger: #FF8B8B;
+    --shadow: 0 1px 3px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.28);
+    --focus: #3FD6B4;
+    --tl-border-todo: #6B7577;
+    --tl-border-doing: #F39C55;
+    --tl-border-done: #00B894;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans CJK SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  [hidden] { display: none !important; }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
+  }
+
+  h1, h2, h3, p { margin: 0; }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    background: var(--surface);
+    color: var(--ink);
+    transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+  }
+  button:hover { background: var(--gray-soft); }
+  button:active { transform: translateY(1px); }
+
+  .btn-primary {
+    background: var(--mint);
+    color: var(--mint-ink);
+    font-weight: 600;
+  }
+  .btn-primary:hover { background: var(--mint-hover-bg); color: var(--mint-hover-ink); }
+  .btn-ghost { background: transparent; color: var(--ink); }
+  .btn-ghost:hover { background: var(--gray-soft); }
+  .btn-danger { color: var(--danger); border-color: var(--line); }
+  .btn-danger:hover { background: var(--gray-soft); }
+
+  input[type="text"], input[type="date"], select {
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 7px 10px;
+  }
+  input[type="text"]:focus, input[type="date"]:focus, select:focus,
+  .todo-text:focus, button:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* ---------- 顶部 ---------- */
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 24px;
+    margin-bottom: 14px;
+  }
+  .app-header h1 {
+    font-size: 22px;
+    color: var(--ink);
+  }
+  .date-line {
+    margin-top: 2px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--mint-deep);
+  }
+  .quote-line {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 620px;
+  }
+  .header-actions { position: relative; }
+
+  .history-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 20;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .history-panel label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .history-panel .row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .history-panel input[type="date"] { flex: 1; min-width: 0; }
+
+  /* ---------- 历史横幅 ---------- */
+  .history-banner {
+    background: var(--gray-soft);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    padding: 8px 16px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* ---------- 空状态 ---------- */
+  .empty-state {
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .empty-state p { color: var(--ink-soft); }
+
+  /* ---------- 主体布局 ---------- */
+  .layout {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+  }
+  .card h2 {
+    font-size: 17px;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .card h3 {
+    font-size: 14px;
+    color: var(--mint-deep);
+    margin-bottom: 10px;
+  }
+
+  /* ---------- 时间轴 ---------- */
+  .tl-row {
+    display: grid;
+    grid-template-columns: 64px 1fr 112px;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--tl-border-todo);
+    background: var(--gray-soft);
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+  .tl-row.doing { border-left-color: var(--tl-border-doing); background: var(--orange-soft); }
+  .tl-row.done { border-left-color: var(--tl-border-done); background: var(--mint-soft); }
+  .tl-time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .tl-text { width: 100%; }
+  .tl-row.done .tl-text { color: var(--muted); }
+
+  /* ---------- 待办 ---------- */
+  .todo-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .todo-col {
+    background: var(--gray-soft);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .todo-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .todo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .todo-check {
+    margin-top: 4px;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    accent-color: var(--mint);
+  }
+  .todo-text {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+    color: var(--ink);
+  }
+  .todo-item.done .todo-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .todo-del {
+    flex: 0 0 auto;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    padding: 0 4px;
+    line-height: 1.4;
+    border-radius: 8px;
+  }
+  .todo-del:hover { color: var(--danger); background: var(--gray-soft); }
+  .todo-prio {
+    flex: 0 0 auto;
+    padding: 2px 4px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  /* ---------- 底部 ---------- */
+  .app-footer {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .progress-row > span { min-width: 90px; }
+  .progress-track {
+    flex: 1;
+    min-width: 200px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--gray-soft);
+    overflow: hidden;
+  }
+  .progress-fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: var(--mint);
+    transition: width .3s ease;
+  }
+  .save-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    background: var(--mint);
+    color: var(--mint-ink);
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+    z-index: 50;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .add-area, .export-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .add-area label { font-size: 14px; color: var(--muted); }
+  .add-area input { width: 260px; max-width: 42vw; }
+
+  ::selection { background: var(--mint); color: var(--mint-ink); }
+
+  @media (max-width: 1023px) {
+    .layout { grid-template-columns: 1fr; }
+    .todo-columns { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 12px 12px 32px; }
+    .app-header { padding: 16px; }
+    .tl-row { grid-template-columns: 56px 1fr; }
+    .tl-status { grid-column: 2; width: 100%; }
+    .history-panel { position: fixed; left: 12px; right: 12px; width: auto; top: auto; bottom: 12px; }
+    .add-area { width: 100%; }
+    .add-area input { flex: 1; max-width: none; width: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition-duration: .01ms !important;
+    }
+  }
+
+  @media print {
+    :root, [data-theme="dark"] {
+      --bg-1: #FFFFFF;
+      --bg-2: #FFFFFF;
+      --surface: #FFFFFF;
+      --ink: #222222;
+      --ink-soft: #333333;
+      --muted: #555555;
+      --line: #CCCCCC;
+      --mint-soft: #EAF9F3;
+      --orange-soft: #FDF0E3;
+      --gray-soft: #F2F4F5;
+    }
+    body { background: #FFFFFF !important; }
+    .app-header, .card { box-shadow: none !important; border: 1px solid #CCCCCC; }
+    #history-btn, .history-panel, .export-area, .add-area, .todo-del,
+    .empty-state, #clear-done, #add-task-btn, #new-task-input, #save-toast { display: none !important; }
+    .tl-row, .todo-item { break-inside: avoid; }
+    .tl-text { border: none !important; background: transparent !important; padding: 0 !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app-header">
+    <div>
+      <h1>每日规划</h1>
+      <p class="date-line">
+        <time id="display-date"></time>
+        <span id="weekday"></span>
+      </p>
+      <p class="quote-line" id="quote"></p>
+    </div>
+    <div class="header-actions">
+      <button type="button" id="history-btn" class="btn-primary"
+              aria-expanded="false" aria-controls="history-panel">📅 查看历史</button>
+      <div class="history-panel" id="history-panel" role="dialog"
+           aria-label="选择要查看的日期" hidden>
+        <label for="date-input">选择日期</label>
+        <div class="row">
+          <input type="date" id="date-input">
+          <button type="button" id="close-history" aria-label="关闭日期选择">✕</button>
+        </div>
+        <button type="button" id="back-today-btn" class="btn-ghost">返回今日</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="history-banner" id="history-banner" role="status" hidden>
+    正在查看：<span id="viewing-date"></span>
+  </div>
+
+  <div class="empty-state" id="empty-state" role="status" hidden>
+    <p>这一天还没有规划，是否复制今天的规划？</p>
+    <button type="button" id="copy-today-btn" class="btn-primary">复制今日规划</button>
+  </div>
+
+  <main class="layout">
+    <section class="card" aria-labelledby="timeline-title">
+      <h2 id="timeline-title">时间轴</h2>
+      <div id="timeline"></div>
+    </section>
+
+    <section class="card" aria-labelledby="todo-title">
+      <h2 id="todo-title">待办事项</h2>
+      <div class="todo-columns">
+        <div class="todo-col">
+          <h3 id="prio-high-title">高优先级</h3>
+          <ul id="todo-high" aria-labelledby="prio-high-title"></ul>
+        </div>
+        <div class="todo-col">
+          <h3 id="prio-mid-title">中优先级</h3>
+          <ul id="todo-mid" aria-labelledby="prio-mid-title"></ul>
+        </div>
+        <div class="todo-col">
+          <h3 id="prio-low-title">低优先级</h3>
+          <ul id="todo-low" aria-labelledby="prio-low-title"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer card">
+    <div class="progress-row">
+      <span id="progress-label">今日完成进度</span>
+      <div class="progress-track" role="progressbar" id="progressbar"
+           aria-labelledby="progress-label"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span class="progress-fill" id="progress-fill"></span>
+      </div>
+      <span id="progress-text" aria-live="polite">0%</span>
+      <button type="button" id="clear-done" class="btn-danger">清空已完成</button>
+    </div>
+    <div class="actions-row">
+      <div class="add-area">
+        <label for="new-task-input">新待办</label>
+        <input type="text" id="new-task-input" placeholder="添加新待办（默认中优先级）…">
+        <button type="button" id="add-task-btn" class="btn-primary">添加任务</button>
+      </div>
+      <div class="export-area">
+        <button type="button" id="save-now" class="btn-primary">💾 一键保存</button>
+        <button type="button" id="export-pdf" class="btn-ghost">导出为PDF</button>
+        <button type="button" id="export-csv" class="btn-ghost">导出为CSV</button>
+        <button type="button" id="export-backup" class="btn-ghost">导出备份</button>
+        <button type="button" id="import-backup" class="btn-ghost">导入备份</button>
+        <input type="file" id="import-file" accept=".json,application/json"
+               aria-hidden="true" tabindex="-1" hidden>
+      </div>
+    </div>
+  </footer>
+  <div class="save-toast" id="save-toast" role="status" hidden></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CONFIG = window.PLANNER_CONFIG || {};
+  var THEME = CONFIG.theme === 'dark' ? 'dark' : 'light';
+  var REQUESTED_DATE = typeof CONFIG.date === 'string' ? CONFIG.date.trim() : '';
+  var PRIORITY_TASKS = CONFIG.priorityTasks || {};
+
+  var QUOTES = [
+    '今日事，今日毕。',
+    '千里之行，始于足下。',
+    '每一次努力，都是幸运的伏笔。',
+    '自律给我自由。',
+    '把今天过好，明天才会更好。',
+    '不积跬步，无以至千里。',
+    '行动是治愈焦虑的良药。',
+    '种一棵树最好的时间是十年前，其次是现在。',
+    '你只管努力，剩下的交给时间。',
+    '日拱一卒，功不唐捐。',
+    '早睡早起，精神百倍。',
+    '今天也要元气满满！'
+  ];
+
+  var STATUS_LABELS = { todo: '未开始', doing: '进行中', done: '已完成' };
+  var PRIORITY_LABELS = { high: '高', mid: '中', low: '低' };
+  var PRIORITIES = ['high', 'mid', 'low'];
+
+  var HOURS = [];
+  for (var h = 6; h <= 23; h += 1) {
+    HOURS.push((h < 10 ? '0' : '') + h + ':00');
+  }
+
+  function $(id) { return document.getElementById(id); }
+
+  var els = {
+    displayDate: $('display-date'),
+    weekday: $('weekday'),
+    quote: $('quote'),
+    historyBtn: $('history-btn'),
+    historyPanel: $('history-panel'),
+    dateInput: $('date-input'),
+    closeHistory: $('close-history'),
+    backTodayBtn: $('back-today-btn'),
+    banner: $('history-banner'),
+    viewingDate: $('viewing-date'),
+    emptyState: $('empty-state'),
+    copyTodayBtn: $('copy-today-btn'),
+    timeline: $('timeline'),
+    todoLists: { high: $('todo-high'), mid: $('todo-mid'), low: $('todo-low') },
+    progressFill: $('progress-fill'),
+    progressBar: $('progressbar'),
+    progressText: $('progress-text'),
+    clearDone: $('clear-done'),
+    newTask: $('new-task-input'),
+    addTaskBtn: $('add-task-btn'),
+    saveNow: $('save-now'),
+    saveToast: $('save-toast'),
+    exportPdf: $('export-pdf'),
+    exportCsv: $('export-csv'),
+    exportBackup: $('export-backup'),
+    importBackup: $('import-backup'),
+    importFile: $('import-file')
+  };
+
+  var viewDate = '';
+  var state = null;
+  var timelineRows = {};
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  function toDateStr(d) {
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+
+  function todayStr() { return toDateStr(new Date()); }
+
+  function parseDateStr(s) {
+    var p = s.split('-');
+    return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  }
+
+  function fmtCN(s) {
+    var p = s.split('-');
+    return p[0] + '年' + p[1] + '月' + p[2] + '日';
+  }
+
+  function weekdayFor(s) {
+    var names = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    return names[parseDateStr(s).getDay()];
+  }
+
+  function dayOfYear(s) {
+    var d = parseDateStr(s);
+    var start = new Date(d.getFullYear(), 0, 1);
+    return Math.floor((d - start) / 86400000);
+  }
+
+  function quoteFor(s) { return QUOTES[dayOfYear(s) % QUOTES.length]; }
+
+  function uid() {
+    return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function seedTodos(list) {
+    var out = [];
+    (list || []).forEach(function (t) {
+      if (typeof t === 'string') {
+        out.push({ id: uid(), text: t, done: false });
+      } else if (t && typeof t.text === 'string') {
+        out.push({ id: uid(), text: t.text, done: !!t.done });
+      }
+    });
+    return out;
+  }
+
+  function defaultState() {
+    var timeline = {};
+    HOURS.forEach(function (t) { timeline[t] = { text: '', status: 'todo' }; });
+    return {
+      timeline: timeline,
+      todos: {
+        high: seedTodos(PRIORITY_TASKS.high),
+        mid: seedTodos(PRIORITY_TASKS.mid),
+        low: seedTodos(PRIORITY_TASKS.low)
+      }
+    };
+  }
+
+  function normalizeState(s) {
+    var out = { timeline: {}, todos: { high: [], mid: [], low: [] } };
+    HOURS.forEach(function (t) {
+      var r = s.timeline && s.timeline[t] ? s.timeline[t] : {};
+      out.timeline[t] = {
+        text: typeof r.text === 'string' ? r.text : '',
+        status: r.status === 'done' || r.status === 'doing' ? r.status : 'todo'
+      };
+    });
+    PRIORITIES.forEach(function (p) {
+      var list = s.todos && s.todos[p] ? s.todos[p] : [];
+      list.forEach(function (x) {
+        if (x && typeof x.text === 'string') {
+          out.todos[p].push({
+            id: x.id || uid(),
+            text: x.text,
+            done: !!x.done
+          });
+        }
+      });
+    });
+    return out;
+  }
+
+  function loadState(dateStr) {
+    try {
+      var raw = localStorage.getItem('planner_' + dateStr);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.timeline) { return normalizeState(parsed); }
+      }
+    } catch (e) { /* 隐私模式等场景退化为内存数据 */ }
+    return defaultState();
+  }
+
+  function saveState() {
+    try { localStorage.setItem('planner_' + viewDate, JSON.stringify(state)); } catch (e) {}
+  }
+
+  /* ---------- 时间轴 ---------- */
+  function buildTimeline() {
+    HOURS.forEach(function (t) {
+      var row = document.createElement('div');
+      row.className = 'tl-row';
+      row.dataset.hour = t;
+
+      var time = document.createElement('span');
+      time.className = 'tl-time';
+      time.textContent = t;
+      time.setAttribute('aria-hidden', 'true');
+
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'tl-text';
+      input.placeholder = '这个时间段做什么？';
+      input.setAttribute('aria-label', t + ' 任务内容');
+      input.addEventListener('input', function () {
+        state.timeline[t].text = input.value;
+        saveState();
+        renderProgress();
+      });
+
+      var select = document.createElement('select');
+      select.className = 'tl-status';
+      select.setAttribute('aria-label', t + ' 任务状态');
+      ['todo', 'doing', 'done'].forEach(function (st) {
+        var opt = document.createElement('option');
+        opt.value = st;
+        opt.textContent = STATUS_LABELS[st];
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', function () {
+        state.timeline[t].status = select.value;
+        row.dataset.status = select.value;
+        row.classList.toggle('done', select.value === 'done');
+        row.classList.toggle('doing', select.value === 'doing');
+        saveState();
+        renderProgress();
+      });
+
+      row.appendChild(time);
+      row.appendChild(input);
+      row.appendChild(select);
+      els.timeline.appendChild(row);
+      timelineRows[t] = { row: row, input: input, select: select };
+    });
+  }
+
+  function renderTimeline() {
+    HOURS.forEach(function (t) {
+      var r = state.timeline[t];
+      var el = timelineRows[t];
+      el.input.value = r.text;
+      el.select.value = r.status;
+      el.row.dataset.status = r.status;
+      el.row.classList.toggle('done', r.status === 'done');
+      el.row.classList.toggle('doing', r.status === 'doing');
+    });
+  }
+
+  /* ---------- 待办 ---------- */
+  function createTodoItem(item, priority) {
+    var li = document.createElement('li');
+    li.className = 'todo-item' + (item.done ? ' done' : '');
+
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'todo-check';
+    cb.checked = item.done;
+    cb.setAttribute('aria-label', '标记完成：' + item.text);
+    cb.addEventListener('change', function () {
+      item.done = cb.checked;
+      saveState();
+      renderTodos();
+      renderProgress();
+    });
+
+    var span = document.createElement('span');
+    span.className = 'todo-text';
+    span.contentEditable = 'true';
+    span.setAttribute('role', 'textbox');
+    span.setAttribute('aria-multiline', 'false');
+    span.tabIndex = 0;
+    span.title = '双击可编辑';
+    span.textContent = item.text;
+    span.addEventListener('input', function () {
+      item.text = span.textContent.replace(/\u00a0/g, ' ').trim();
+      cb.setAttribute('aria-label', '标记完成：' + item.text);
+      prio.setAttribute('aria-label', '将任务移动到其他优先级：' + item.text);
+      saveState();
+    });
+    span.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); span.blur(); }
+    });
+    span.addEventListener('blur', function () {
+      var txt = span.textContent.replace(/\u00a0/g, ' ').trim();
+      item.text = txt;
+      span.textContent = txt;
+      saveState();
+      renderProgress();
+    });
+
+    var prio = document.createElement('select');
+    prio.className = 'todo-prio';
+    prio.setAttribute('aria-label', '将任务移动到其他优先级：' + item.text);
+    PRIORITIES.forEach(function (p) {
+      var opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = PRIORITY_LABELS[p] + '优先级';
+      prio.appendChild(opt);
+    });
+    prio.value = priority;
+    prio.addEventListener('change', function () {
+      var target = prio.value;
+      if (target === priority) { return; }
+      state.todos[priority] = state.todos[priority].filter(function (x) { return x !== item; });
+      state.todos[target].push(item);
+      saveState();
+      renderTodos();
+      renderProgress();
+    });
+
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'todo-del';
+    del.textContent = '✕';
+    del.setAttribute('aria-label', '删除任务：' + item.text);
+    del.addEventListener('click', function () {
+      state.todos[priority] = state.todos[priority].filter(function (x) { return x !== item; });
+      saveState();
+      renderTodos();
+      renderProgress();
+    });
+
+    li.appendChild(cb);
+    li.appendChild(span);
+    li.appendChild(prio);
+    li.appendChild(del);
+    return li;
+  }
+
+  function renderTodos() {
+    PRIORITIES.forEach(function (p) {
+      var ul = els.todoLists[p];
+      ul.textContent = '';
+      state.todos[p].forEach(function (item) {
+        ul.appendChild(createTodoItem(item, p));
+      });
+    });
+  }
+
+  function addTask() {
+    var txt = els.newTask.value.trim();
+    if (!txt) { els.newTask.focus(); return; }
+    state.todos.mid.push({ id: uid(), text: txt, done: false });
+    els.newTask.value = '';
+    saveState();
+    renderTodos();
+    renderProgress();
+    els.newTask.focus();
+  }
+
+  /* ---------- 进度 / 空状态 ---------- */
+  function renderProgress() {
+    var total = 0;
+    var done = 0;
+    HOURS.forEach(function (t) {
+      var r = state.timeline[t];
+      if (r.text.trim()) {
+        total += 1;
+        if (r.status === 'done') { done += 1; }
+      }
+    });
+    PRIORITIES.forEach(function (p) {
+      state.todos[p].forEach(function (x) {
+        if (x.text.trim()) {
+          total += 1;
+          if (x.done) { done += 1; }
+        }
+      });
+    });
+    var pct = total ? Math.round(done / total * 100) : 0;
+    els.progressFill.style.width = pct + '%';
+    els.progressBar.setAttribute('aria-valuenow', String(pct));
+    els.progressBar.setAttribute('aria-valuetext', pct + '%');
+    els.progressText.textContent = pct + '%（' + done + '/' + total + '）';
+  }
+
+  function hasAnyData() {
+    for (var i = 0; i < HOURS.length; i += 1) {
+      if (state.timeline[HOURS[i]].text.trim()) { return true; }
+    }
+    for (var j = 0; j < PRIORITIES.length; j += 1) {
+      if (state.todos[PRIORITIES[j]].length > 0) { return true; }
+    }
+    return false;
+  }
+
+  function renderEmptyState() {
+    var show = viewDate !== todayStr() && !hasAnyData();
+    els.emptyState.hidden = !show;
+  }
+
+  /* ---------- 头部 / 历史 ---------- */
+  function renderHeader() {
+    els.displayDate.textContent = fmtCN(viewDate);
+    els.weekday.textContent = ' ' + weekdayFor(viewDate);
+    els.quote.textContent = '「' + quoteFor(viewDate) + '」';
+    document.title = '每日规划 - ' + fmtCN(viewDate);
+    var isToday = viewDate === todayStr();
+    els.banner.hidden = isToday;
+    els.viewingDate.textContent = fmtCN(viewDate);
+    els.dateInput.value = viewDate;
+  }
+
+  function renderAll() {
+    document.documentElement.setAttribute('data-theme', THEME);
+    renderHeader();
+    renderTimeline();
+    renderTodos();
+    renderProgress();
+    renderEmptyState();
+  }
+
+  function viewDateStr(s) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) { return; }
+    viewDate = s;
+    state = loadState(s);
+    renderAll();
+    closeHistory();
+  }
+
+  function openHistory() {
+    els.historyPanel.hidden = false;
+    els.historyBtn.setAttribute('aria-expanded', 'true');
+    els.dateInput.value = viewDate;
+    els.dateInput.focus();
+  }
+
+  function closeHistory() {
+    els.historyPanel.hidden = true;
+    els.historyBtn.setAttribute('aria-expanded', 'false');
+    els.historyBtn.focus();
+  }
+
+  function copyTodayToView() {
+    state = JSON.parse(JSON.stringify(loadState(todayStr())));
+    saveState();
+    renderAll();
+    var firstInput = els.timeline.querySelector('input.tl-text');
+    if (firstInput) { firstInput.focus(); }
+  }
+
+  /* ---------- 导出 ---------- */
+  function csvCell(v) {
+    return '"' + String(v).replace(/\r?\n/g, ' ').replace(/"/g, '""') + '"';
+  }
+
+  function exportCSV() {
+    var rows = [['时间', '任务内容', '状态', '优先级']];
+    HOURS.forEach(function (t) {
+      var r = state.timeline[t];
+      if (r.text.trim()) {
+        rows.push([t, r.text.trim(), STATUS_LABELS[r.status], '—']);
+      }
+    });
+    PRIORITIES.forEach(function (p) {
+      state.todos[p].forEach(function (x) {
+        if (x.text.trim()) {
+          rows.push(['', x.text.trim(), x.done ? '已完成' : '未完成', PRIORITY_LABELS[p]]);
+        }
+      });
+    });
+    var csv = '\uFEFF' + rows.map(function (r) {
+      return r.map(csvCell).join(',');
+    }).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'planner_' + viewDate + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  function exportBackup() {
+    var data = {};
+    var count = 0;
+    try {
+      for (var i = 0; i < localStorage.length; i += 1) {
+        var key = localStorage.key(i);
+        if (key && key.indexOf('planner_') === 0) {
+          data[key] = JSON.parse(localStorage.getItem(key));
+          count += 1;
+        }
+      }
+    } catch (e) {
+      showToast('导出失败：无法读取本地数据');
+      return;
+    }
+    var payload = {
+      app: 'DailyPlanner',
+      version: 1,
+      exportedAt: todayStr(),
+      data: data
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'daily-planner-backup-' + todayStr() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    showToast('已导出备份（' + count + ' 天）');
+  }
+
+  function importBackup(text) {
+    var payload;
+    try {
+      payload = JSON.parse(text);
+    } catch (e) {
+      showToast('导入失败：文件不是有效的 JSON');
+      return;
+    }
+    var entries = payload && payload.data && typeof payload.data === 'object' ? payload.data : null;
+    if (!entries) {
+      showToast('导入失败：备份文件格式不正确');
+      return;
+    }
+    var count = 0;
+    Object.keys(entries).forEach(function (key) {
+      if (!/^planner_\d{4}-\d{2}-\d{2}$/.test(key)) { return; }
+      var val = entries[key];
+      if (!val || typeof val !== 'object' || !val.timeline || !val.todos) { return; }
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+        count += 1;
+      } catch (e) { /* 存储空间不足等场景，跳过该日期 */ }
+    });
+    if (count === 0) {
+      showToast('导入失败：备份中没有可用的规划数据');
+      return;
+    }
+    state = loadState(viewDate);
+    renderAll();
+    showToast('已导入 ' + count + ' 天的规划数据');
+  }
+
+  var toastTimer = null;
+  function showToast(msg) {
+    els.saveToast.textContent = msg;
+    els.saveToast.hidden = false;
+    if (toastTimer) { clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function () { els.saveToast.hidden = true; }, 2600);
+  }
+
+  /* ---------- 事件绑定 ---------- */
+  els.historyBtn.addEventListener('click', function () {
+    if (els.historyPanel.hidden) { openHistory(); } else { closeHistory(); }
+  });
+  els.closeHistory.addEventListener('click', closeHistory);
+  els.backTodayBtn.addEventListener('click', function () { viewDateStr(todayStr()); });
+  els.dateInput.addEventListener('change', function () {
+    var v = els.dateInput.value;
+    if (v) { viewDateStr(v); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !els.historyPanel.hidden) { closeHistory(); }
+  });
+  document.addEventListener('click', function (e) {
+    if (els.historyPanel.hidden) { return; }
+    if (e.target !== els.historyBtn && !els.historyPanel.contains(e.target)) {
+      closeHistory();
+    }
+  });
+  els.copyTodayBtn.addEventListener('click', copyTodayToView);
+  els.clearDone.addEventListener('click', function () {
+    PRIORITIES.forEach(function (p) {
+      state.todos[p] = state.todos[p].filter(function (x) { return !x.done; });
+    });
+    HOURS.forEach(function (t) {
+      var r = state.timeline[t];
+      if (r.status === 'done' && r.text.trim()) {
+        r.text = '';
+        r.status = 'todo';
+      }
+    });
+    saveState();
+    renderAll();
+  });
+  els.addTaskBtn.addEventListener('click', addTask);
+  els.newTask.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); addTask(); }
+  });
+  els.saveNow.addEventListener('click', function () {
+    saveState();
+    showToast('已保存至 ' + fmtCN(viewDate) + '，可在「📅 查看历史」中找回');
+  });
+  els.exportPdf.addEventListener('click', function () { window.print(); });
+  els.exportCsv.addEventListener('click', exportCSV);
+  els.exportBackup.addEventListener('click', exportBackup);
+  els.importBackup.addEventListener('click', function () {
+    els.importFile.click();
+  });
+  els.importFile.addEventListener('change', function () {
+    var file = els.importFile.files && els.importFile.files[0];
+    if (!file) { return; }
+    var reader = new FileReader();
+    reader.onload = function () { importBackup(String(reader.result || '')); };
+    reader.onerror = function () { showToast('读取备份文件失败'); };
+    reader.readAsText(file);
+    els.importFile.value = '';
+  });
+
+  /* ---------- 初始化 ---------- */
+  buildTimeline();
+  viewDate = REQUESTED_DATE && /^\d{4}-\d{2}-\d{2}$/.test(REQUESTED_DATE)
+    ? REQUESTED_DATE
+    : todayStr();
+  state = loadState(viewDate);
+  renderAll();
+})();
+</script>
+</body>
+</html>
