@@ -3888,9 +3888,14 @@ main {
   /* 音乐文件夹迁移（一次性）：旧路径 音乐/xxx → 新位置 ../music/mp3/xxx */
   (function migrateMusicPaths() {
     let changed = false;
+    const encMusic = '%E9%9F%B3%E4%B9%90/'; // “音乐/”的 URL 编码形式（旧清单使用）
     playlist.forEach((s) => {
-      if (s.url && s.url.indexOf('音乐/') === 0) {
+      if (!s.url) return;
+      if (s.url.indexOf('音乐/') === 0) {
         s.url = '../music/mp3/' + s.url.slice('音乐/'.length);
+        changed = true;
+      } else if (s.url.indexOf(encMusic) === 0) {
+        s.url = '../music/mp3/' + s.url.slice(encMusic.length);
         changed = true;
       }
     });
