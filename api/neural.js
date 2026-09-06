@@ -12,6 +12,21 @@ const CORS = {
   'Access-Control-Allow-Headers': 'Authorization, Content-Type'
 };
 
+// 手动读取请求体（不依赖运行时的自动解析，保证任意 Node 运行时都可用）
+function readBody(req) {
+  return new Promise((resolve) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+      if (data.length > 2 * 1024 * 1024) req.destroy(); // 上限 2MB
+    });
+    req.on('end', () => {
+      try { resolve(data ? JSON.parse(data) : {}); } catch (e) { resolve({}); }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
 module.exports = async function handler(req, res) {
   // 浏览器预检
   if (req.method === 'OPTIONS') {
@@ -29,14 +44,13 @@ module.exports = async function handler(req, res) {
     (process.env.EVOROZEN_API_KEY ? 'Bearer ' + process.env.EVOROZEN_API_KEY : '');
   if (auth) headers['Authorization'] = auth;
 
-  let payload = '{}';
-  try { payload = JSON.stringify(req.body || {}); } catch (e) { /* ignore */ }
+  const body = await readBody(req);
 
   try {
     const upstream = await fetch(TARGET, {
       method: 'POST',
       headers: headers,
-      body: payload
+      body: JSON.stringify(body)
     });
     const text = await upstream.text();
     res.writeHead(upstream.status, Object.assign({}, CORS, { 'Content-Type': 'application/json' }));
