@@ -31,3 +31,26 @@
 | words-manifest.js / words-import.txt | 单词清单（自动生成） |
 | samhome-playlist-backup.json | 歌单备份（可经「导入备份」恢复） |
 | start-server.ps1 | 可选：本地 HTTP 服务启动脚本（http://127.0.0.1:8000/） |
+
+## ☁️ Neural Pulse 云同步（Evorozen Apex Buildathon）
+
+主页已按赛事要求把核心数据层接入 [Neural Pulse Virtual DB](https://pulse.evorozen.com/docs)：
+
+- 9 类数据（资源库 / 开支 / 待办 / 作业 / 单词 / 计划榜 / 歌单 / 转盘 / 每日规划）映射为云端表；
+- localStorage 仅作离线缓存；每次增删改自动排队同步，断网恢复后自动补传；
+- 同步采用官方标准流程：`drop_table` → 确定性 `create_schema` → `bulk_insert`（2026-09-06 实测可用）；
+- API 密钥仅存本机浏览器（不写入源码）；顶栏「☁️ 云同步」上传、「⤵ 下载」拉取，双击「☁️ 云同步」可配置 API 地址与密钥。
+
+### 在线部署（推荐 Vercel，附同源代理）
+
+官方 `/api/neural` 目前未返回 CORS 头，浏览器直接调用会被拦截。仓库内置同源代理解决：
+
+- `api/neural.js`：Vercel Serverless 函数，转发请求并补上 `Access-Control-Allow-Origin: *`；
+- `vercel.json`：Vercel 配置。
+
+部署步骤：
+1. 用 GitHub 账号登录 [vercel.com](https://vercel.com)，点击 **Add New → Project**；
+2. Import 本仓库 `mystudy202607/sam-ppt`，框架选 **Other**，直接 Deploy；
+3. 部署完成后打开网站，双击「☁️ 云同步」→ API 地址填 `/api/neural` → 填入密钥 → 点「☁️ 云同步」。
+
+注意：线上环境不含本地歌曲文件（`music-manifest.js` 指向本地 `../music/mp3/`），歌单会显示但本地歌曲无法播放；可自行在歌单中添加在线 MP3 链接。

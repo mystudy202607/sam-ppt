@@ -5615,10 +5615,26 @@ main {
     }
   }
 
+  // 双击云同步：进入设置（先问 API 地址，再问密钥）
+  function neuralSettingsPrompt() {
+    const curApi = neuralApiBase();
+    const v = prompt(
+      'Neural Pulse API 地址：\n本地默认直连官方。\n若已部署同源代理（Vercel/Cloudflare），请填代理地址，例如 /api/neural',
+      curApi
+    );
+    if (v == null) return;
+    const api = String(v).trim();
+    if (api) {
+      try { localStorage.setItem('samhome.neural.api', api); } catch (e) {}
+    }
+    promptNeuralKey();
+    neuralRenderStatus();
+  }
+
   // 事件绑定与周期刷新
   $('#cloudSyncBtn').addEventListener('click', onCloudSync);
   $('#cloudPullBtn').addEventListener('click', onCloudPull);
-  $('#cloudSyncBtn').addEventListener('dblclick', () => { promptNeuralKey(); });
+  $('#cloudSyncBtn').addEventListener('dblclick', neuralSettingsPrompt);
   setInterval(() => {
     if (document.visibilityState === 'visible') neuralFlush(true);
   }, 60000);
