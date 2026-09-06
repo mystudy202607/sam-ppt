@@ -3923,6 +3923,10 @@ main {
       } else if (s.url.indexOf(encMusic) === 0) {
         s.url = '../music/mp3/' + s.url.slice(encMusic.length);
         changed = true;
+      } else if (s.url.indexOf('../music/mp3/') === 0) {
+        // 2026-08-31 项目移入 Sam's Home 子文件夹后，旧歌单路径需加深一层
+        s.url = '../../music/mp3/' + s.url.slice('../music/mp3/'.length);
+        changed = true;
       }
     });
     if (changed) saveList('samhome.playlist', playlist);
@@ -5425,19 +5429,42 @@ main {
     return json;
   }
 
-  // 把一张表整体推送到云端：先清空云端旧数据，再分批写入（本地为权威副本）
+  // 把一张表整体推送到云端（本地为权威副本，全量覆盖云端）：
+  // 官方标准流程 = drop_table（可忽略“表不存在”）→ create_schema（确定性注册表，
+  // 不依赖 AI 引擎）→ bulk_insert 分批写入。2026-09-06 实测该流程可用。
   async function neuralPushTable(table, rows) {
     if (!rows || !rows.length) return;
+    // 1) 尝试清空/删除云端旧表（不存在时报错可忽略）
     try {
       await neuralReq({
         action_type: 'drop_table',
         prompt: '重置云端表 ' + table,
         data_payload: { table: table }
       });
-    } catch (e) { /* 表不存在等错误可忽略，直接走写入 */ }
+    } catch (e) { /* 表不存在等错误可忽略 */ }
+    // 2) 确定性注册表结构（只声明 id 列即可，其余字段由 LivingDNA 自动适配）
+    const schemaRes = await neuralReq({
+      action_type: 'create_schema',
+      prompt: '注册云端表 ' + table,
+      data_payload: {
+        tables: [{
+          name: table,
+          columns: [{ name: 'id', type: 'text', primary: true }]
+        }]
+      }
+    });
+    if (!schemaRes || schemaRes.executed === false) {
+      throw new Error('建表失败：' + table);
+    }
+    // 3) 确保每条记录都有 id，再分批写入
+    const safeRows = rows.map((r) => {
+      const o = Object.assign({}, r);
+      if (o.id == null) o.id = uid();
+      return o;
+    });
     const CHUNK = 100;
-    for (let i = 0; i < rows.length; i += CHUNK) {
-      const chunk = rows.slice(i, i + CHUNK);
+    for (let i = 0; i < safeRows.length; i += CHUNK) {
+      const chunk = safeRows.slice(i, i + CHUNK);
       await neuralReq({
         action_type: 'bulk_insert',
         prompt: '同步 ' + table + ' 数据（第 ' + (i / CHUNK + 1) + ' 批）',
@@ -5479,7 +5506,7 @@ main {
     const res = await neuralReq({
       action_type: 'select_data',
       prompt: '读取云端表 ' + table,
-      data_payload: { table: table, limit: 5000 }
+      data_payload: { table: table }
     });
     const rows = res && Array.isArray(res.data) ? res.data : [];
     if (meta.dynamic) {
